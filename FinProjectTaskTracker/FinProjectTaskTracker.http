@@ -1,0 +1,6 @@
+@FinProjectTaskTracker_HostAddress = http://localhost:5120
+
+GET {{FinProjectTaskTracker_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
