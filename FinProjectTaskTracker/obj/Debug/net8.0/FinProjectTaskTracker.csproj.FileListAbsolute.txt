@@ -31,3 +31,4 @@ D:\4 ks\Testing\FinProjectTaskTracker\FinProjectTaskTracker\obj\Debug\net8.0\ref
 D:\4 ks\Testing\FinProjectTaskTracker\FinProjectTaskTracker\obj\Debug\net8.0\FinProjectTaskTracker.pdb
 D:\4 ks\Testing\FinProjectTaskTracker\FinProjectTaskTracker\obj\Debug\net8.0\FinProjectTaskTracker.genruntimeconfig.cache
 D:\4 ks\Testing\FinProjectTaskTracker\FinProjectTaskTracker\obj\Debug\net8.0\ref\FinProjectTaskTracker.dll
+D:\4 ks\Testing\FinProjectTaskTracker\FinProjectTaskTracker\obj\Debug\net8.0\FinProjectTaskTracker.sourcelink.json
