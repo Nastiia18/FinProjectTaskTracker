@@ -1,38 +1,83 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using FinProjectTaskTracker.Models;
-
+using FinProjectTaskTracker.Services;
 
 namespace FinProjectTaskTracker.Controllers;
 
-
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/boards")]
 public class BoardsController : ControllerBase
 {
-    private static List<Board> boards = new List<Board>();
+    private readonly IBoardService _boardService;
 
-
-    [HttpGet]
-    public IActionResult GetBoards()
+    public BoardsController(IBoardService boardService)
     {
+        _boardService = boardService;
+    }
+
+    // 1. GET /api/boards
+    [HttpGet]
+    public async Task<IActionResult> GetBoards()
+    {
+        var boards = await _boardService.GetBoardsAsync();
         return Ok(boards);
     }
 
-
+    // 2. POST /api/boards
     [HttpPost]
-    public IActionResult CreateBoard(Board board)
+    public async Task<IActionResult> CreateBoard([FromBody] Board board)
     {
-        if (boards.Any(b => b.Name == board.Name))
-            return BadRequest("Board name must be unique");
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
 
+        try
+        {
+            var created = await _boardService.CreateBoardAsync(board);
+            return CreatedAtAction(nameof(GetBoards), new { id = created.Id }, created);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
 
-        board.Id = Guid.NewGuid();
-        board.CreatedAt = DateTime.UtcNow;
+    // 3. GET /api/boards/{id}/tasks
+    [HttpGet("{id}/tasks")]
+    public async Task<IActionResult> GetBoardTasks(
+        Guid id,
+        [FromQuery] Status? status,
+        [FromQuery] Priority? priority)
+    {
+        try
+        {
+            var tasks = await _boardService.GetTasksAsync(id, status, priority);
+            return Ok(tasks);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+    }
 
+    // 4. POST /api/boards/{id}/tasks
+    [HttpPost("{id}/tasks")]
+    public async Task<IActionResult> CreateTask(Guid id, [FromBody] TaskItem task)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
 
-        boards.Add(board);
-
-
-        return Ok(board);
+        try
+        {
+            var createdTask = await _boardService.AddTaskToBoardAsync(id, task);
+            return CreatedAtAction(nameof(GetBoardTasks), new { id = id }, createdTask);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 }

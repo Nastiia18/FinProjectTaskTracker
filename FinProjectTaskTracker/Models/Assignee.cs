@@ -1,4 +1,5 @@
-﻿public class Assignee
+﻿namespace FinProjectTaskTracker.Models;
+public class Assignee
 {
     public Guid Id { get; set; }
     public string Name { get; set; }

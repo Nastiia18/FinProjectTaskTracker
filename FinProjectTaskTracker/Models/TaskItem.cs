@@ -1,4 +1,5 @@
-﻿public enum Status
+﻿namespace FinProjectTaskTracker.Models;
+public enum Status
 {
     Todo,
     InProgress,
