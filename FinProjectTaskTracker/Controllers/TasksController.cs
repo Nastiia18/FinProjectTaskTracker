@@ -1,118 +1,70 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using FinProjectTaskTracker.Models;
+using FinProjectTaskTracker.Services;
 
 namespace FinProjectTaskTracker.Controllers;
 
 [ApiController]
-[Route("api")]
+[Route("api/tasks")]
 public class TasksController : ControllerBase
 {
-   private static List<TaskItem> tasks = new List<TaskItem>();
-   
-   //GET
-   [HttpGet("boards/{boardId}/tasks")]
-   public IActionResult GetTasks(Guid boardId, [FromQuery] Status? status, [FromQuery] Priority? priority)
-   {
-       var query = tasks.Where(t => t.BoardId == boardId);
+    private readonly ITaskService _taskService;
 
-       if (status.HasValue)
-           query = query.Where(t => t.Status == status.Value);
-       
-       if (priority.HasValue)
-           query = query.Where(t => t.Priority == priority.Value);
-       
-       return Ok(query.ToList());
-   }
-  
-   //POST
-   [HttpPost("boards/{boardId}/tasks")]
-   public IActionResult CreateTask(Guid boardId, TaskItem task)
-   {
-       if (task.DueDate <= DateTime.UtcNow)
-           return BadRequest("Due date must be in the future");
+    public TasksController(ITaskService taskService)
+    {
+        _taskService = taskService;
+    }
 
-       if (task.Priority == Priority.Critical && task.AssigneeId == null)
-           return BadRequest("Critical tasks must have assignee");
+    // 1. PUT /api/tasks/{id}
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateTask(Guid id, [FromBody] TaskItem updatedTask)
+    {
+        try
+        {
+            var result = await _taskService.UpdateTaskAsync(id, updatedTask);
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
 
-       task.Id = Guid.NewGuid();
-       task.BoardId = boardId;
-       task.CreatedAt = DateTime.UtcNow;
-       task.Status = Status.Todo;
+    // 2. PATCH /api/tasks/{id}/status
+    [HttpPatch("{id}/status")]
+    public async Task<IActionResult> ChangeStatus(Guid id, [FromBody] Status newStatus)
+    {
+        try
+        {
+            var result = await _taskService.ChangeStatusAsync(id, newStatus);
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
 
-       tasks.Add(task);
+    // 3. DELETE /api/tasks/{id}
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteTask(Guid id)
+    {
+        try
+        {
+            await _taskService.DeleteTaskAsync(id);
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return NotFound(ex.Message);
+        }
+    }
 
-       return Ok(task);
-   }
-  
-   //PATCH status
-   [HttpPatch("tasks/{id}/status")]
-   public IActionResult ChangeStatus(Guid id, [FromBody] Status newStatus)
-   {
-       var task = tasks.FirstOrDefault(t => t.Id == id);
-       
-       if (task == null)
-           return NotFound();
-       
-       if (task.Status == Status.Todo && newStatus == Status.Done)
-           return BadRequest("Cannot skip InProgress");
-
-       if (task.Status == Status.Done)
-           return BadRequest("Cannot change status from Done");
-       
-       if (task.Status == Status.InProgress && newStatus == Status.Todo)
-           return BadRequest("Cannot go back to Todo");
-
-       task.Status = newStatus;
-
-       return Ok(task);
-   }
-  
-   //DELETE
-   [HttpDelete("tasks/{id}")]
-   public IActionResult DeleteTask(Guid id)
-   {
-       var task = tasks.FirstOrDefault(t => t.Id == id);
-       if (task == null)
-           return NotFound();
-       
-       tasks.Remove(task);
-
-       return NoContent();
-   }
-  
-   //PUT task
-   [HttpPut("tasks/{id}")]
-   public IActionResult UpdateTask(Guid id, TaskItem updatedTask)
-   {
-       var task = tasks.FirstOrDefault(t => t.Id == id);
-       
-       if (task == null)
-           return NotFound();
-       
-       if (updatedTask.DueDate <= DateTime.UtcNow)
-           return BadRequest("Due date must be in the future");
-
-       if (updatedTask.Priority == Priority.Critical && updatedTask.AssigneeId == null)
-           return BadRequest("Critical tasks must have assignee");
-
-
-       task.Title = updatedTask.Title;
-       task.Description = updatedTask.Description;
-       task.Priority = updatedTask.Priority;
-       task.AssigneeId = updatedTask.AssigneeId;
-       task.DueDate = updatedTask.DueDate;
-       
-       return Ok(task);
-   }
-  
-   //overdue
-   [HttpGet("tasks/overdue")]
-   public IActionResult GetOverdueTasks()
-   {
-       var overdue = tasks
-           .Where(t => t.DueDate < DateTime.UtcNow && t.Status != Status.Done)
-           .ToList();
-       
-       return Ok(overdue);
-   }
+    // 4. GET /api/tasks/overdue
+    [HttpGet("overdue")]
+    public async Task<IActionResult> GetOverdueTasks()
+    {
+        var result = await _taskService.GetOverdueAsync();
+        return Ok(result);
+    }
 }
