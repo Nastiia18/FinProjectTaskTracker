@@ -7,4 +7,5 @@ public interface ITaskRepository
     Task AddAsync(TaskItem task);
     Task UpdateAsync(TaskItem task);
     Task DeleteAsync(TaskItem task);
+    Task BulkUpdateStatusAsync(Guid boardId, Status oldStatus, Status newStatus);
 }

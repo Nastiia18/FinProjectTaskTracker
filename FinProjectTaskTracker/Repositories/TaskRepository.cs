@@ -38,4 +38,14 @@ public class TaskRepository : ITaskRepository
         _context.Tasks.Remove(task);
         await _context.SaveChangesAsync();
     }
+    public async Task BulkUpdateStatusAsync(
+        Guid boardId,
+        Status oldStatus,
+        Status newStatus)
+    {
+        await _context.Tasks
+            .Where(t => t.BoardId == boardId && t.Status == oldStatus)
+            .ExecuteUpdateAsync(setters =>
+                setters.SetProperty(t => t.Status, newStatus));
+    }
 }
