@@ -9,7 +9,6 @@ public static class TestDataSeeder
 {
     public static async Task SeedAsync(AppDbContext dbContext)
     {
-        if (await dbContext.Boards.AnyAsync()) return;
 
         var fixture = new Fixture();
         fixture.Behaviors.Remove(fixture.Behaviors.OfType<ThrowingRecursionBehavior>().First());
