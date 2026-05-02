@@ -15,7 +15,7 @@ public class TaskServiceTests
     [Fact]
     public async Task ChangeStatus_TodoToInProgress_ShouldWork()
     {
-        // Arrange
+     
         var repo = new Mock<ITaskRepository>();
 
         var task = new TaskItem
@@ -31,11 +31,9 @@ public class TaskServiceTests
             .Returns(Task.CompletedTask);
 
         var service = new TaskService(repo.Object);
-
-        // Act
+        
         var result = await service.ChangeStatusAsync(task.Id, Status.InProgress);
-
-        // Assert
+        
         Assert.Equal(Status.InProgress, result.Status);
     }
 
@@ -140,9 +138,33 @@ public class TaskServiceTests
 
         await Assert.ThrowsAsync<ArgumentException>(act);
     }
+    
+    // 3. PRIORITY + ASSIGNEE
+    [Fact]
+    public async Task UpdateTask_CriticalWithAssignee_ShouldWork()
+    {
+        var repo = new Mock<ITaskRepository>();
+        var existing = new TaskItem { Id = Guid.NewGuid() };
+        var updated = new TaskItem
+        {
+            Title = "Critical Task",
+            Priority = Priority.Critical,
+            AssigneeId = Guid.NewGuid(), // ВИКОНАВЕЦЬ ПРИЗНАЧЕНИЙ
+            DueDate = DateTime.UtcNow.AddDays(1)
+        };
 
+        repo.Setup(r => r.GetByIdAsync(existing.Id)).ReturnsAsync(existing);
+        repo.Setup(r => r.UpdateAsync(It.IsAny<TaskItem>())).Returns(Task.CompletedTask);
+    
+        var service = new TaskService(repo.Object);
+        
+        var result = await service.UpdateTaskAsync(existing.Id, updated);
+        
+        Assert.Equal(Priority.Critical, result.Priority);
+        Assert.NotNull(result.AssigneeId);
+    }
 
-   // 3. OVERDUE LOGIC
+   //4. OVERDUE LOGIC
     
     [Fact]
     public async Task GetOverdue_ShouldReturnOnlyOverdueTasks()
@@ -181,5 +203,25 @@ public class TaskServiceTests
 
         Assert.Single(result);
         Assert.Equal(Status.Todo, result[0].Status);
+    }
+    
+    // 5. DATE VALIDATION
+    [Fact]
+    public async Task UpdateTask_PastDueDate_ShouldThrow()
+    {
+        var repo = new Mock<ITaskRepository>();
+        var existing = new TaskItem { Id = Guid.NewGuid() };
+        var updated = new TaskItem
+        {
+            Title = "Old Task",
+            DueDate = DateTime.UtcNow.AddDays(-1) 
+        };
+
+        repo.Setup(r => r.GetByIdAsync(existing.Id)).ReturnsAsync(existing);
+    
+        var service = new TaskService(repo.Object);
+        
+        await Assert.ThrowsAsync<ArgumentException>(() => 
+            service.UpdateTaskAsync(existing.Id, updated));
     }
 }
