@@ -27,7 +27,7 @@ jobs:
 
 
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore FinProjectTaskTracker.sln
 
 
       - name: Build project
