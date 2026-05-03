@@ -149,7 +149,7 @@ public class TaskServiceTests
         {
             Title = "Critical Task",
             Priority = Priority.Critical,
-            AssigneeId = Guid.NewGuid(), // ВИКОНАВЕЦЬ ПРИЗНАЧЕНИЙ
+            AssigneeId = Guid.NewGuid(), 
             DueDate = DateTime.UtcNow.AddDays(1)
         };
 

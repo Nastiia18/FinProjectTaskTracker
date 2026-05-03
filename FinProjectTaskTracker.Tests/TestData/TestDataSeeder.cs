@@ -18,7 +18,7 @@ public static class TestDataSeeder
 
         var boards = fixture.Build<Board>()
             .Without(b => b.Id) 
-            .With(b => b.CreatedAt, DateTime.UtcNow) // ВИПРАВЛЕНО: Явно вказуємо UTC
+            .With(b => b.CreatedAt, DateTime.UtcNow) 
             .CreateMany(100)
             .ToList();
 
