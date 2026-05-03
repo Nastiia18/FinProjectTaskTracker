@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FinProjectTaskTracker")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0f98f8c27b7887634a3c5e517a5ac583affba990")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+822f21e10fe26ada906a921ab148072d6acdbf23")]
 [assembly: System.Reflection.AssemblyProductAttribute("FinProjectTaskTracker")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FinProjectTaskTracker")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
