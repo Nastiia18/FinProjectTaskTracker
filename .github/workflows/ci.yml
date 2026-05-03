@@ -34,18 +34,18 @@ jobs:
 
       - name: Restore dependencies
         run: dotnet restore FinProjectTaskTracker.sln
-        working-directory: ${{ github.workspace }}/FinProjectTaskTracker
+        working-directory: ${{ github.workspace }}
 
 
       - name: Build project
         run: dotnet build FinProjectTaskTracker.sln --no-restore --configuration Release
-        working-directory: ${{ github.workspace }}/FinProjectTaskTracker
+        working-directory: ${{ github.workspace }}
         
       
       # Модульні + інтеграційні + database tests
       - name: Run .NET Tests
         run: dotnet test FinProjectTaskTracker.sln --no-build --configuration Release --verbosity normal
-        working-directory: ${{ github.workspace }}/FinProjectTaskTracker
+        working-directory: ${{ github.workspace }}
         
       
       # Встановлення k6
