@@ -22,9 +22,6 @@ jobs:
       - name: Debug structure
         run: ls -R .
 
-      - name: Print solution file
-        run: cat FinProjectTaskTracker.sln
-
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
