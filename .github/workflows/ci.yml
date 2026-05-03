@@ -29,7 +29,7 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Clean
-         run: dotnet clean FinProjectTaskTracker.sln
+        run: dotnet clean FinProjectTaskTracker.sln
 
 
       - name: Restore dependencies
